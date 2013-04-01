@@ -2,10 +2,8 @@ development:
   sessions:
     default:
       database: <%= ENV['MONGO_DB'] %>
-      username: <%= ENV['MONGO_USERNAME'] %>
-      password: <%= ENV['MONGO_PASSWORD'] %>
       hosts:
-        - <%= ENV['MONGO_HOST'] %>:27017
+        - <%= ENV['MONGO_HOST'] %>
   options:
     raise_not_found_error: false
 
