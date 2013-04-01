@@ -40,7 +40,7 @@ class Url
     field :count_all_hatena, type: Integer
 end
 
-EXCLUDE = /twitter\.com|twitpic\.com|twipple\.jp|yfrog\.com|photozou\.jp/
+EXCLUDE = /twitter\.com|twitpic\.com|twipple\.jp|yfrog\.com|photozou\.jp|shindanmaker\.com|lockerz\.com/
 
 def get_urls(size)
     urls = []
