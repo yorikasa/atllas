@@ -41,17 +41,27 @@ class Webpage
 
     def popular_url?(url)
         # For YouTube
-        if /youtube\.com/ =~ URI(url).host
-            if /v=(.+?)(&|\Z)/ =~ url
+        if /youtube\.com/i =~ URI(url).host
+            if /v=(.+?)(&|\Z)/i =~ url
                 url = "http://www.youtube.com/watch?v=#{$1}"
                 return url
+            else
+                return nil
             end
         end
         # For Amazon
-        if /amazon\.co\.jp/ =~ URI(url).host
-            if /(dp|gp)\/(.+?)(\/|\Z)/ =~ url
-                url = "http://www.amazon.co.jp/#{$1}/#{$2}"
-                return url
+        if /amazon\.co\.jp/i =~ URI(url).host
+            if /(dp|gp)\/(.+?)(\/|\Z)/i =~ url
+                asin = $2
+                sp = $1
+                if /[0-9]/ =~ asin
+                    url = "http://www.amazon.co.jp/#{sp}/#{asin}"
+                    return url
+                else
+                    return nil
+                end
+            else
+                return nil
             end
         end
         url
@@ -96,6 +106,7 @@ class Webpage
         @body =  Readability::Document.new(@page.body).content.encode('utf-8')
         @body.gsub!(/(<\/?div>|<\/?p>)/,'')
         @body.gsub!(/https?:.+?(\s|\Z)/, '')
+        @body.gsub!(/[\s\n]+/, ' ')
         if @body.size > @page.title.size
             return @body
         else

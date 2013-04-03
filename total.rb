@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 # coding: utf-8
 
 # require 'bundler/setup'
@@ -40,7 +41,7 @@ class Url
     field :count_all_hatena, type: Integer
 end
 
-EXCLUDE = /twitter\.com|twitpic\.com|twipple\.jp|yfrog\.com|photozou\.jp|shindanmaker\.com|lockerz\.com/
+EXCLUDE = /twitter\.com|twitpic\.com|twipple\.jp|yfrog\.com|photozou\.jp|shindanmaker\.com|lockerz\.com|instagram\.com|via\.me|rekkacopy\.com|sns48\.com|550909\.com|twitcasting\.tv|gungho\.jp|notfollow\.me|webken\.net|applica\.jp|twtmanager\.com|otapps\.net|angel-live\.com|194964\.com|furaieki\.net|d2c\.co\.jp|oidn\.info|isop\.co\.jp|tsukasa02\.com|puzzdra\.mobi|yoyakuga\.com|facebook\.com|happymail\.co\.jp|atarijo\.com|pcmax\.jp|uranaitter\.com|shioyakiwa\.blog\.fc2\.com|henchmen\.jp|nubee\.com|madam-sex\.com|justunfollow\.com/i
 
 def get_urls(size)
     urls = []
@@ -60,7 +61,7 @@ end
 old = Time.now
 puts "Start: #{old}"
 
-urls = get_urls(3000)
+urls = get_urls(1000)
 Parallel.each(urls, in_threads: 30) do |url|
     webpage = Webpage.new(url[:url])
     next unless wurl = webpage.url
