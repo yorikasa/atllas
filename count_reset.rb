@@ -28,6 +28,7 @@ class Url
 end
 
 Url.each do |url|
+    # countの移行
     next if url.counting_twitter == 0
     url.set(:counted_twitter, url.counting_twitter)
     if url.count_all_twitter
@@ -36,4 +37,7 @@ Url.each do |url|
         url.set(:count_all_twitter, url.counting_twitter)
     end
     url.set(:counting_twitter, 0)
+
+    # データ量を減らすために、`:counted_twitter`が1のURLは捨てる
+    url.delete if url[:counted_twitter] == 1
 end
