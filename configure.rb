@@ -12,7 +12,3 @@ def open_env(path)
 end
 
 open_env(".env")
-
-# Mongoid
-
-Mongoid.load!('mongoid.yml')

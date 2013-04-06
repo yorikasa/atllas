@@ -1,9 +1,11 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 require 'uri'
 require 'open-uri'
 require 'mechanize'
 require 'timeout'
 require 'readability'
+
+require './amazon'
 
 class Webpage
     # @param url [String] WebページのURL
@@ -11,7 +13,7 @@ class Webpage
         @url = deparam(popular_url?(fetch(url)))
     end
 
-    attr_reader :url
+    attr_reader :url, :image_url
     
     # 短縮URL (bit.ly等) などのリダイレクトをlimit回まで追いかける
     # うまくいけば最終的な行き先のURLを返す
@@ -49,17 +51,16 @@ class Webpage
                 return nil
             end
         end
+
         # For Amazon
         if /amazon\.co\.jp/i =~ URI(url).host
-            if /(dp|gp)\/(.+?)(\/|\Z)/i =~ url
-                asin = $2
-                sp = $1
-                if /[0-9]/ =~ asin
-                    url = "http://www.amazon.co.jp/#{sp}/#{asin}"
-                    return url
-                else
-                    return nil
-                end
+            if /\/([a-zA-Z0-9]{10})(?:[\/?]|$)/ =~ url
+                asin = $1
+                product = Amazon.new.request(asin)
+                @title = product[:title]
+                @image_url = product[:image_url]
+                @body = ""
+                return product[:detail_page_url]
             else
                 return nil
             end

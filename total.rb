@@ -22,6 +22,8 @@ Twitter.configure do |config|
     config.oauth_token_secret = ENV['OAUTH_TOKEN_SECRET']
 end
 
+Mongoid.load!('mongoid.yml')
+
 class TempUrl
     include Mongoid::Document
     field :url, type: String
@@ -31,6 +33,7 @@ end
 class Url
     include Mongoid::Document
     field :url, type: String
+    field :image_url, type: String
     field :title, type: String
     field :body, type: String
     field :category, type: String
@@ -62,45 +65,75 @@ def get_urls(size)
     urls
 end
 
-# old = Time.now
-# puts "Start: #{old}"
+def video?(url)
+    return true if url.url.include?('youtube.com')
+    return true if url.url.include?('www.nicovideo.jp')
+    nil
+end
 
-urls = get_urls(1000)
-Parallel.each(urls, in_threads: 30) do |url|
-    webpage = Webpage.new(url[:url])
-    next unless wurl = webpage.url
-    next unless webpage.title
-    # NGSiteに登録されているhostだったら無視する
-    skip = nil
-    NGSite.each do |site|
-        if webpage.url.include?(site.domain)
-            skip = true
-            break
-        end
-    end
-    next if skip
-    # もしURLが"http://news.google.com/"みたいなトップページふうだったら無視する
-    uri = URI(webpage.url)
-    next if (uri.path.size < 2) and (not uri.query) and (not uri.fragment)
+def app?(url)
+    return true if url.url.include?('itunes.apple.com')
+    return true if url.url.include?('play.google.com')
+    nil
+end
 
-    q = Url.where(url: wurl)
+def amazon?(url)
+    return true if url.url.include?('amazon.co.jp')
+    nil
+end
+
+def add(webpage, url)
+    q = Url.where(url: webpage.url)
     if q.exists?
         q.first.push_all(:timestamps_twitter, url[:timestamps_twitter])
         q.first.inc(:counting_twitter, url[:timestamps_twitter].size)
     else
-        wtitle = webpage.title
-        wbody = webpage.body
-        wcategory = MyClassifier.new.classify(nouns(wbody).join(' '))
-        q.create(title: wtitle,
-                 body: wbody,
-                 category: wcategory,
+        q.create(title: webpage.title,
+                 body: webpage.body,
+                 category: MyClassifier.new.classify(nouns(webpage.body).join(' ')),
                  timestamps_twitter: url[:timestamps_twitter],
                  counting_twitter: url[:timestamps_twitter].size)
     end
 end
 
-# new = Time.now
-# puts "End: #{new}"
+def add_without_body(webpage, url)
+    q = Url.where(url: webpage.url)
+    if q.exists?
+        q.first.push_all(:timestamps_twitter, url[:timestamps_twitter])
+        q.first.inc(:counting_twitter, url[:timestamps_twitter].size)
+    else
+        q.create(title: webpage.title,
+                 image_url: webpage.image_url,
+                 timestamps_twitter: url[:timestamps_twitter],
+                 counting_twitter: url[:timestamps_twitter].size)
+    end
+end
 
-# puts "Time Elapsed: #{(new-old)/60} min"
-# puts "Memory Usage: #{`ps -o rss= -p #{Process.pid}`.to_i}KB"
+urls = get_urls(10)
+Parallel.each(urls, in_threads: 30) do |url|
+    webpage = Webpage.new(url[:url])
+
+    # URLかタイトルがないと無視
+    next if (not webpage.url) or (not webpage.title)
+
+    if video?(webpage) or app?(webpage) or amazon?(webpage)
+        add_without_body(webpage, url)
+    else
+        # もしURLが"http://news.google.com/"みたいなトップページふうだったら無視
+        uri = URI(webpage.url)
+        next if (uri.path.size < 2) and (not uri.query) and (not uri.fragment)
+        
+        # NGSiteに登録されているhostだったら無視する
+        skip = nil
+        NGSite.each do |site|
+            if webpage.url.include?(site.domain)
+                skip = true
+                break
+            end
+        end
+        next if skip
+
+        # ここまでたどり着いた君は追加すべき優秀なURLだ！
+        add(webpage, url)
+    end
+end

@@ -6,6 +6,8 @@ require 'open-uri'
 require 'CGI'
 require 'nokogiri'
 
+require './configure'
+
 # Amazon Product Advertising API用のクラス
 # 今のところは、requestメソッド専用
 class Amazon
