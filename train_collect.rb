@@ -13,7 +13,7 @@ require 'MeCab'
 require './configure'
 
 EXCEPTION = /^[!-\/:.,?\[\]{}@#\$%^&*()_+=\\|'";<>~`「」『』、。〜ーw★☆█♪\^0-9]+?$/
-categories = %w(society politic economy sport world tech science entertainment 2ch)
+categories = %w(society politic sport tech entertainment 2ch)
 
 class Trainer
     include Mongoid::Document
@@ -68,8 +68,8 @@ def body(url)
     body.gsub!(/(<\/?div>|<\/?p>)/,'')
     body.gsub!(/https?:.+?(\s|\Z)/, '')
     body
-# rescue
-#     return body = ""
+rescue
+    return body = ""
 end
 
 categories.each do |cat|

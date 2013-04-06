@@ -25,7 +25,7 @@ class MyClassifier
             File.open("classifier", "r") {|f| @classifier = Marshal.load(f)}
         rescue
             # 動画 (YouTube, ニコニコ, Ustream, etc)", "画像" は別枠でやる
-            @categories = %w(society politic economy sport world tech science entertainment 2ch)
+            @categories = %w(society politic sport entertainment tech fun)
             @classifier = Classifier::Bayes.new(*@categories)
         end
     end
@@ -40,7 +40,11 @@ class MyClassifier
 
     def train
         Trainer.each do |t|
-            @classifier.train(t.category, t.body)
+            if t.category == "2ch"
+                @classifier.train("fun", t.body)
+            else
+                @classifier.train(t.category, t.body)
+            end
         end
         File.open("classifier", "wb") {|f| Marshal.dump(@classifier, f)}
     end
