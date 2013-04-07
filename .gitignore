@@ -1,3 +1,5 @@
 .env
 .DS_Store
 .rbenv-version
+mongoid.yml
+log.log
