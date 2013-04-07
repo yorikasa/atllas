@@ -109,7 +109,7 @@ def add_without_body(webpage, url)
     end
 end
 
-urls = get_urls(10)
+urls = get_urls(1000)
 Parallel.each(urls, in_threads: 30) do |url|
     webpage = Webpage.new(url[:url])
 

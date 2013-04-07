@@ -3,7 +3,7 @@
 require 'openssl'
 require 'base64'
 require 'open-uri'
-require 'CGI'
+require 'cgi'
 require 'nokogiri'
 
 require './configure'

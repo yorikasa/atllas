@@ -11,6 +11,7 @@
 require 'mongoid'
 
 require './configure'
+Mongoid.load!('mongoid.yml')
 
 class Url
     include Mongoid::Document
