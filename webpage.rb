@@ -1,6 +1,7 @@
 # coding: utf-8
 require 'uri'
 require 'open-uri'
+require 'cgi'
 require 'mechanize'
 require 'timeout'
 require 'readability'
@@ -76,6 +77,13 @@ class Webpage
         url.gsub!(/[&?]*?utm_.+?=.+?(&|\Z)/, '')
         url.gsub!(/[&?]*?fr=.+?(&|\Z)/, '')
         url
+    end
+
+    # そのページのはてなブックマーク数を返す
+    def hatena_count
+        return @hatena if @hatena
+        @hatena = open("http://api.b.st-hatena.com/entry.count?url=#{CGI.escape(url)}").read.to_i
+        @hatena
     end
 
     # Webページのタイトルを取得して返す

@@ -37,12 +37,17 @@ class Url
     field :title, type: String
     field :body, type: String
     field :category, type: String
-    field :timestamps_twitter, type: Array
 
+    # Twitterでの言及数を数える
+    field :timestamps_twitter, type: Array
     field :counting_twitter, type: Integer
     field :counted_twitter, type: Integer
     field :count_all_twitter, type: Integer
+    
     field :count_all_facebook, type: Integer
+
+    # はてなブックマークの数を数える
+    field :count_recent_hatena, type: Integer
     field :count_all_hatena, type: Integer
 end
 
