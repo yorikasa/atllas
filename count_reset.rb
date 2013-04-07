@@ -36,9 +36,10 @@ class Url
     field :count_all_hatena, type: Integer
 end
 
+# @return [Integer] 直近のカウント数 or nil
 def count_move_twitter(url)
     # countの移行
-    return nil if url.counting_twitter == 0
+    return 0 if url.counting_twitter == 0
     url.set(:counted_twitter, url.counting_twitter)
     if url.count_all_twitter
         url.set(:count_all_twitter, url.counting_twitter + url.count_all_twitter)
@@ -50,10 +51,10 @@ def count_move_twitter(url)
     # データ量を減らすために、`:count_all_twitter`が1のURLは捨てる
     if url[:count_all_twitter] == 1
         url.delete
-        return nil
+        return 0
     end
-    # うまくいったときは nil 以外の何かを返す
-    ""
+    # うまくいったときは数を返す
+    url[:counted_twitter]
 end
 
 def count_move_hatena(url)
@@ -70,7 +71,17 @@ def count_move_hatena(url)
     end
 end
 
+def article?(url)
+    return nil if /youtube\.com|www\.nicovideo\.jp/ =~ url
+    return nil if /play\.google\.com|itunes\.apple\.com/ =~ url
+    return nil if /amazon\.co\.jp|rakuten\.co\.jp/ =~ url
+    url
+end
+
 Url.each do |url|
-    next if not count_move_twitter(url)
-    count_move_hatena(url)
+    if count_move_twitter(url) > 2
+        if article?(url.url)
+            count_move_hatena(url)
+        end
+    end
 end
