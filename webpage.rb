@@ -66,6 +66,20 @@ class Webpage
                 return nil
             end
         end
+
+        # For NicoNico
+        if "www.nicovideo.jp".include?(URI(url).host)
+            if /\/watch\/(.+?)(\/|\z)/ =~ url
+                request = "http://ext.nicovideo.jp/api/getthumbinfo/#{$1}"
+                doc = Nokogiri::XML(open(request))
+                @title = doc.css("description").first.text
+                @image_url = doc.css("thumbnail_url").first.text
+                @body = ""
+                return doc.css("watch_url").first.text
+            else
+                return nil
+            end
+        end
         url
     rescue
         url
