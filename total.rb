@@ -56,6 +56,11 @@ class NGSite
     field :domain, type: String
 end
 
+class WhiteSite
+    include Mongoid::Document
+    field :domain, type: String
+end
+
 def get_urls(size)
     urls = []
     TempUrl.each do |url|
@@ -127,7 +132,16 @@ Parallel.each(urls, in_threads: 30) do |url|
         # もしURLが"http://news.google.com/"みたいなトップページふうだったら無視
         uri = URI(webpage.url)
         next if (uri.path.size < 2) and (not uri.query) and (not uri.fragment)
-        
+
+        # Whitelistに登録されて"いなかったら"skip
+        skip = true
+        WhiteSite.each do |site|
+            if webpage.url.include?(site.domain)
+                skip = nil
+                break
+            end
+        end
+        next if skip
         # NGSiteに登録されているhostだったら無視する
         skip = nil
         NGSite.each do |site|
