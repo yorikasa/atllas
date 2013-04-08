@@ -32,6 +32,8 @@ end
 
 class Url
     include Mongoid::Document
+    include Mongoid::Timestamps
+    
     field :url, type: String
     field :image_url, type: String
     field :title, type: String
