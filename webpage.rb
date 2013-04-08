@@ -92,6 +92,7 @@ class Webpage
         url.gsub!(/[&?]*?fr=.+?(&|\Z)/, '')
         url.gsub!(/[&?]*?from=.+?(&|\Z)/, '')
         url.gsub!(/[&?]*?ref=.+?(&|\Z)/, '')
+        url.gsub!(/[&?]*?dg=.+?(&|\Z)/, '')
         url
     end
 
