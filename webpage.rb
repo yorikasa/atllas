@@ -90,6 +90,8 @@ class Webpage
         return nil unless url
         url.gsub!(/[&?]*?utm_.+?=.+?(&|\Z)/, '')
         url.gsub!(/[&?]*?fr=.+?(&|\Z)/, '')
+        url.gsub!(/[&?]*?from=.+?(&|\Z)/, '')
+        url.gsub!(/[&?]*?ref=.+?(&|\Z)/, '')
         url
     end
 
