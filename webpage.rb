@@ -82,7 +82,7 @@ class Webpage
         end
         url
     rescue
-        url
+        nil
     end
 
     # URLから明らかに不要なパラメータを取り除く
