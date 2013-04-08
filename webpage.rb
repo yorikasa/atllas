@@ -55,7 +55,7 @@ class Webpage
 
         # For Amazon
         if /amazon\.co\.jp/i =~ URI(url).host
-            if /\/([a-zA-Z0-9]{10})(?:[\/?]|$)/ =~ url
+            if /\/([A-Z0-9]{10})(?:[\/?]|$)/ =~ url
                 asin = $1
                 product = Amazon.new.request(asin)
                 @title = product[:title]
