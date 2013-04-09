@@ -89,11 +89,14 @@ class Webpage
     # URLから明らかに不要なパラメータを取り除く
     def deparam(url)
         return nil unless url
-        url.gsub!(/[&?]*?utm_.+?=.+?(&|\Z)/, '')
-        url.gsub!(/[&?]*?fr=.+?(&|\Z)/, '')
-        url.gsub!(/[&?]*?from=.+?(&|\Z)/, '')
-        url.gsub!(/[&?]*?ref=.+?(&|\Z)/, '')
-        url.gsub!(/[&?]*?dg=.+?(&|\Z)/, '')
+        url.gsub!(/[&?]*?utm_.+?=.+?(&|\Z)/i, '')
+        url.gsub!(/[&?]*?fr=.+?(&|\Z)/i, '')
+        url.gsub!(/[&?]*?from=.+?(&|\Z)/i, '')
+        url.gsub!(/[&?]*?ref=.+?(&|\Z)/i, '')
+        url.gsub!(/[&?]*?dg=.+?(&|\Z)/i, '')
+        url.gsub!(/[&?]*?inb=.+?(&|\Z)/i, '')
+        url.gsub!(/[&?]*?feedType=.+?(&|\Z)/i, '')
+        url.gsub!(/[&?]*?feedName=.+?(&|\Z)/i, '')
         url
     end
 
