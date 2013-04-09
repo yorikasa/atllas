@@ -198,7 +198,7 @@ class Webpage
                 word = node.surface.force_encoding('utf-8')
                 # 記号だけが続く文字列は、それが「名詞」と判断されていようが無視する
                 unless word =~ EXCEPTION
-                    nouns << word # if word.length > 1
+                    nouns << word if word.length > 0
                 end
             end
             node = node.next
