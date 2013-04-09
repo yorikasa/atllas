@@ -204,8 +204,8 @@ class Webpage
             node = node.next
         end
         nouns
-    # rescue
-    #     return []
+    rescue
+        return []
     end
 end
 
