@@ -5,6 +5,7 @@ require 'cgi'
 require 'mechanize'
 require 'timeout'
 require 'readability'
+require 'MeCab'
 
 require './amazon'
 
@@ -122,6 +123,14 @@ class Webpage
         @url
     end
 
+    def title_array
+        return nil unless @url
+        title unless @title
+
+        @title_array = nouns(@title)
+        @title_array
+    end
+
     # ReadabilityでWebページの本文 (と判断されたもの) を返す
     # @return [String] 本文らしきもの
     def body
@@ -174,6 +183,26 @@ class Webpage
             end
         }
         @page = agent.get(url)
+    end
+
+    EXCEPTION = /^[!-\/:.,?\[\]{}@#\$%^&*()_+=\\|'";<>~`「」『』、。〜ーw★☆█♪\^0-9]+?$/
+    def nouns(string)
+        m = MeCab::Tagger.new
+        node = m.parseToNode(NKF.nkf('-Z0Z1w', string.chomp.downcase))
+        nouns = []
+        while(node.next)
+            if node.feature.force_encoding('utf-8').split(',')[0] == "名詞"
+                word = node.surface.force_encoding('utf-8')
+                # 記号だけが続く文字列は、それが「名詞」と判断されていようが無視する
+                unless word =~ EXCEPTION
+                    nouns << word # if word.length > 1
+                end
+            end
+            node = node.next
+        end
+        nouns
+    # rescue
+    #     return []
     end
 end
 

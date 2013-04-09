@@ -37,6 +37,7 @@ class Url
     field :url, type: String
     field :image_url, type: String
     field :title, type: String
+    field :title_array, type: Array
     field :body, type: String
     field :category, type: String
 
@@ -101,6 +102,7 @@ def add(webpage, url)
         q.first.inc(:counting_twitter, url[:timestamps_twitter].size)
     else
         q.create(title: webpage.title,
+                 title_array: webpage.title_array,
                  body: webpage.body,
                  category: MyClassifier.new.classify(nouns(webpage.body).join(' ')),
                  timestamps_twitter: url[:timestamps_twitter],
