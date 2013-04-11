@@ -27,7 +27,7 @@ Mongoid.load!('mongoid.yml')
 class TempUrl
     include Mongoid::Document
     field :url, type: String
-    field :timestamps_twitter, type: Array
+    field :tweets, type: Array
 end
 
 class Url
@@ -42,7 +42,7 @@ class Url
     field :category, type: String
 
     # Twitterでの言及数を数える
-    field :timestamps_twitter, type: Array
+    field :tweets, type: Array
     field :counting_twitter, type: Integer
     field :counted_twitter, type: Integer
     field :count_all_twitter, type: Integer
@@ -69,7 +69,7 @@ def get_urls(size)
     TempUrl.each do |url|
         obj = Hash.new
         obj[:url] = url.url
-        obj[:timestamps_twitter] = url.timestamps_twitter
+        obj[:tweets] = url.tweets
         urls << obj
         url.delete
         break if urls.size >= size
@@ -98,28 +98,28 @@ end
 def add(webpage, url)
     q = Url.where(url: webpage.url)
     if q.exists?
-        q.first.push_all(:timestamps_twitter, url[:timestamps_twitter])
-        q.first.inc(:counting_twitter, url[:timestamps_twitter].size)
+        q.first.push_all(:tweets, url[:tweets])
+        q.first.inc(:counting_twitter, url[:tweets].size)
     else
         q.create(title: webpage.title,
                  title_array: webpage.title_array,
                  body: webpage.body,
                  category: MyClassifier.new.classify(nouns(webpage.body).join(' ')),
-                 timestamps_twitter: url[:timestamps_twitter],
-                 counting_twitter: url[:timestamps_twitter].size)
+                 tweets: url[:tweets],
+                 counting_twitter: url[:tweets].size)
     end
 end
 
 def add_without_body(webpage, url)
     q = Url.where(url: webpage.url)
     if q.exists?
-        q.first.push_all(:timestamps_twitter, url[:timestamps_twitter])
-        q.first.inc(:counting_twitter, url[:timestamps_twitter].size)
+        q.first.push_all(:tweets, url[:tweets])
+        q.first.inc(:counting_twitter, url[:tweets].size)
     else
         q.create(title: webpage.title,
                  image_url: webpage.image_url,
-                 timestamps_twitter: url[:timestamps_twitter],
-                 counting_twitter: url[:timestamps_twitter].size)
+                 tweets: url[:tweets],
+                 counting_twitter: url[:tweets].size)
     end
 end
 
