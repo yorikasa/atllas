@@ -39,8 +39,8 @@ end
 # @return [Integer] 直近のカウント数 or nil
 def count_move_twitter(url)
     # countの移行
-    return 0 if url.counting_twitter == 0
     url.set(:counted_twitter, url.counting_twitter)
+    return 0 if url.counting_twitter == 0
     if url.count_all_twitter
         url.set(:count_all_twitter, url.counting_twitter + url.count_all_twitter)
     else
