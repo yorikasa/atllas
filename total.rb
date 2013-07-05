@@ -110,19 +110,6 @@ def add(webpage, url)
     end
 end
 
-def add_without_body(webpage, url)
-    q = Url.where(url: webpage.url)
-    if q.exists?
-        q.first.push_all(:tweets, url[:tweets])
-        q.first.inc(:counting_twitter, url[:tweets].size)
-    else
-        q.create(title: webpage.title,
-                 image_url: webpage.image_url,
-                 tweets: url[:tweets],
-                 counting_twitter: url[:tweets].size)
-    end
-end
-
 urls = get_urls(1500)
 Parallel.each(urls, in_threads: 30) do |url|
     webpage = Webpage.new(url[:url])
@@ -130,33 +117,29 @@ Parallel.each(urls, in_threads: 30) do |url|
     # URLかタイトルがないと無視
     next if (not webpage.url) or (not webpage.title)
 
-    if video?(webpage) or app?(webpage) or amazon?(webpage)
-        add_without_body(webpage, url)
-    else
-        # もしURLが"http://news.google.com/"みたいなトップページふうだったら無視
-        uri = URI(webpage.url)
-        next if (uri.path.size < 2) and (not uri.query) and (not uri.fragment)
+    # もしURLが"http://news.google.com/"みたいなトップページふうだったら無視
+    uri = URI(webpage.url)
+    next if (uri.path.size < 2) and (not uri.query) and (not uri.fragment)
 
-        # Whitelistに登録されて"いなかったら"skip
-        skip = true
-        WhiteSite.each do |site|
-            if webpage.url.include?(site.domain)
-                skip = nil
-                break
-            end
+    # Whitelistに登録されて"いなかったら"skip
+    skip = true
+    WhiteSite.each do |site|
+        if webpage.url.include?(site.domain)
+            skip = nil
+            break
         end
-        next if skip
-        # NGSiteに登録されているhostだったら無視する
-        skip = nil
-        NGSite.each do |site|
-            if webpage.url.include?(site.domain)
-                skip = true
-                break
-            end
-        end
-        next if skip
-
-        # ここまでたどり着いた君は追加すべき優秀なURLだ！
-        add(webpage, url)
     end
+    next if skip
+    # NGSiteに登録されているhostだったら無視する
+    skip = nil
+    NGSite.each do |site|
+        if webpage.url.include?(site.domain)
+            skip = true
+            break
+        end
+    end
+    next if skip
+
+    # ここまでたどり着いた君は追加すべき優秀なURLだ！
+    add(webpage, url)
 end
