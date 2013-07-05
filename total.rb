@@ -54,11 +54,6 @@ class Url
     field :count_all_hatena, type: Integer
 end
 
-class NGSite
-    include Mongoid::Document
-    field :domain, type: String
-end
-
 class WhiteSite
     include Mongoid::Document
     field :domain, type: String
@@ -76,23 +71,6 @@ def get_urls(size)
         break if TempUrl.count < size/10
     end
     urls
-end
-
-def video?(url)
-    return true if url.url.include?('youtube.com')
-    return true if url.url.include?('www.nicovideo.jp')
-    nil
-end
-
-def app?(url)
-    return true if url.url.include?('itunes.apple.com')
-    return true if url.url.include?('play.google.com')
-    nil
-end
-
-def amazon?(url)
-    return true if url.url.include?('amazon.co.jp')
-    nil
 end
 
 def add(webpage, url)
@@ -126,15 +104,6 @@ Parallel.each(urls, in_threads: 30) do |url|
     WhiteSite.each do |site|
         if webpage.url.include?(site.domain)
             skip = nil
-            break
-        end
-    end
-    next if skip
-    # NGSiteに登録されているhostだったら無視する
-    skip = nil
-    NGSite.each do |site|
-        if webpage.url.include?(site.domain)
-            skip = true
             break
         end
     end
